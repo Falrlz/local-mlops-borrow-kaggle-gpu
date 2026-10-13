@@ -1,0 +1,43 @@
+# Local documentation & internal notes
+docs/
+
+# Python
+__pycache__/
+*.py[cod]
+build/
+dist/
+wheels/
+*.egg-info
+.venv/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Secrets
+.env
+kaggle.json
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# kaggle-bridge: zips going to / coming from Kaggle (keep the empty folders)
+kaggle-bridge/upload-to-kaggle/*
+!kaggle-bridge/upload-to-kaggle/.gitkeep
+kaggle-bridge/download-from-kaggle/*
+!kaggle-bridge/download-from-kaggle/.gitkeep
+
+# mlops-project: datasets (keep data/raw/ so users know where images go)
+mlops-project/data/*
+!mlops-project/data/raw/
+mlops-project/data/raw/*
+!mlops-project/data/raw/.gitkeep
+
+# mlops-project: pipeline outputs (runs, MLflow)
+mlops-project/outputs/
+
+# mlops-project: final model (model_info.json is committed)
+mlops-project/models/*
+!mlops-project/models/model_info.json
