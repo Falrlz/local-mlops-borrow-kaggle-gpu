@@ -1,0 +1,4 @@
+# Logging to the local MLflow (run_name comes from train.yaml).
+# Local runs: full_pipeline logs automatically.
+# Kaggle runs: after unpacking, run log_run_pipeline by hand.
+use_mlflow: true            # false = no MLflow: runs stay in outputs/runs/ only

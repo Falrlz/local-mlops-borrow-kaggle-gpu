@@ -37,7 +37,3 @@ mlops-project/data/raw/*
 
 # mlops-project: pipeline outputs (runs, MLflow)
 mlops-project/outputs/
-
-# mlops-project: final model (model_info.json is committed)
-mlops-project/models/*
-!mlops-project/models/model_info.json

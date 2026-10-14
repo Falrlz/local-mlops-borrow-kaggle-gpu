@@ -1,0 +1,20 @@
+# One training run. run_name is the only place a run is named: evaluate and
+# log_run all use it. Change it before every new run.
+run_name: efficientnet_b0_train_kaggle
+
+# Model (any torchvision classification model name)
+backbone: efficientnet_b0
+pretrained: true            # ImageNet weights, cached in outputs/pretrained/
+
+# Training
+image_size: 224
+epochs: 20
+batch_size: 32
+lr: 0.001
+patience: 5                 # stop after this many epochs without val macro F1 gain
+
+# Environment
+device: auto                # auto | cpu | cuda
+num_workers: 2
+seed: 42
+deterministic: true

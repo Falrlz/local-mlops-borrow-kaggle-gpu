@@ -1,10 +1,18 @@
 """
-Logging utility.
+Logging utility and a progress bar for batch loops.
 """
 
 import logging
 
 from rich.logging import RichHandler
+from rich.progress import (
+    BarColumn,
+    MofNCompleteColumn,
+    Progress,
+    TextColumn,
+    TimeElapsedColumn,
+    TimeRemainingColumn,
+)
 
 
 def get_logger(name: str = "mlops", level: int = logging.INFO) -> logging.Logger:
@@ -26,3 +34,22 @@ def get_logger(name: str = "mlops", level: int = logging.INFO) -> logging.Logger
         logger.propagate = False
 
     return logger
+
+
+def progress_bar() -> Progress:
+    """
+    A batch progress bar that disappears when the loop ends.
+
+    Tasks need a `status` field (e.g. the running loss), shown after the bar.
+    """
+
+    return Progress(
+        TextColumn("{task.description}"),
+        BarColumn(),
+        MofNCompleteColumn(),
+        TextColumn("{task.fields[status]}"),
+        TimeElapsedColumn(),
+        TextColumn("<"),
+        TimeRemainingColumn(),
+        transient=True,
+    )

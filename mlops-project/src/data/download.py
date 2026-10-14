@@ -10,10 +10,9 @@ import urllib.request
 from pathlib import Path
 
 from src.core.logger import get_logger
+from src.data.cleaning import IMAGE_EXTS
 
 logger = get_logger("mlops.download")
-
-IMAGE_EXTS = {".jpg", ".jpeg", ".png"}
 
 
 def is_populated(target_dir: Path) -> bool:

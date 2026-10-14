@@ -17,11 +17,13 @@ CONFIGS_DIR = BASE_DIR / "configs"
 DATA_DIR = BASE_DIR / "data"
 RAW_DIR = DATA_DIR / "raw"
 SPLITS_DIR = DATA_DIR / "splits"
+MANIFEST_PATH = SPLITS_DIR / "split_manifest.csv"
 
 # Pipeline outputs
 OUTPUTS_DIR = BASE_DIR / "outputs"
 RUNS_DIR = OUTPUTS_DIR / "runs"
+PRETRAINED_DIR = OUTPUTS_DIR / "pretrained"
 MLFLOW_DIR = OUTPUTS_DIR / "mlflow"
 
-# Final model
-MODELS_DIR = BASE_DIR / "models"
+# Split names used everywhere
+SPLITS = ["train", "val", "test"]

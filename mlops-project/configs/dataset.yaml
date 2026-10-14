@@ -2,3 +2,9 @@
 # The archive holds flower_photos/<class>/*.jpg and flower_photos/LICENSE.txt.
 # Own images: put them in data/raw/<class>/ and skip the download.
 url: https://storage.googleapis.com/download.tensorflow.org/example_images/flower_photos.tgz
+
+# Data preparation (data/raw/ -> data/splits/)
+seed: 42
+split_ratio: [70, 15, 15]   # train:val:test, stratified by class
+save_size: 224              # shorter side in data/splits/ (shrink only, never upscale)
+overwrite: false            # true = rebuild data/splits/ if it already has files

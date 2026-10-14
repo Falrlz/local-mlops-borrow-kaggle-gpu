@@ -7,10 +7,10 @@ type fails before any work starts.
 """
 
 from pathlib import Path
-from typing import TypeVar
+from typing import Literal, TypeVar
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, PositiveInt
 
 
 class StrictModel(BaseModel):
@@ -23,9 +23,54 @@ class StrictModel(BaseModel):
 # configs/dataset.yaml
 # ---------------------------------------------------------------------------
 class DatasetConfig(StrictModel):
-    """Settings for the dataset download."""
+    """Settings for the download and data preparation pipelines."""
 
     url: str = Field(min_length=1, description="Download URL of the .tgz archive")
+    seed: int
+    split_ratio: tuple[PositiveInt, PositiveInt, PositiveInt] = Field(
+        description="train:val:test ratio"
+    )
+    save_size: int = Field(gt=0, description="Shorter side in data/splits/")
+    overwrite: bool = Field(description="Rebuild data/splits/ if it has files")
+
+
+# ---------------------------------------------------------------------------
+# configs/train.yaml
+# ---------------------------------------------------------------------------
+class TrainConfig(StrictModel):
+    """Settings for the training pipeline."""
+
+    run_name: str = Field(min_length=1)
+    backbone: str = Field(min_length=1, description="torchvision model name")
+    pretrained: bool
+    image_size: int = Field(gt=0)
+    epochs: int = Field(gt=0)
+    batch_size: int = Field(gt=0)
+    lr: float = Field(gt=0)
+    patience: int = Field(gt=0)
+    device: Literal["auto", "cpu", "cuda"]
+    num_workers: int = Field(ge=0)
+    seed: int
+    deterministic: bool
+
+
+# ---------------------------------------------------------------------------
+# configs/evaluate.yaml
+# ---------------------------------------------------------------------------
+class EvaluateConfig(StrictModel):
+    """Settings for the evaluation pipeline (run_name comes from train.yaml)."""
+
+    weights: Literal["best", "last"]
+    batch_size: int = Field(gt=0)
+
+
+# ---------------------------------------------------------------------------
+# configs/tracking.yaml
+# ---------------------------------------------------------------------------
+class TrackingConfig(StrictModel):
+    """Settings for logging to MLflow (run_name comes from train.yaml)."""
+
+    use_mlflow: bool = Field(description="Log runs to MLflow")
 
 
 # ---------------------------------------------------------------------------
