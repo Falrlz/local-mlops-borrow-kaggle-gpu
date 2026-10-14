@@ -1,0 +1,3 @@
+# Evaluates the run named in train.yaml (run_name lives only there).
+weights: best               # best | last
+batch_size: 64
