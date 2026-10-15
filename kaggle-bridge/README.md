@@ -2,11 +2,19 @@
 
 Moves [`mlops-project`](../mlops-project/) to a free Kaggle GPU and brings the finished run back home. It only moves files: training is the same command as on the laptop, and MLflow logging stays in the project.
 
-```text
- LAPTOP                         KAGGLE                            LAPTOP
- A. pack.py                     C. train_on_kaggle.ipynb          D. unpack.py
-    code.zip + data.zip  ─B─►      copy → install → GPU check  ─►  E. log_run_pipeline
-                                   → full_pipeline → <run>.zip        → MLflow UI
+```mermaid
+flowchart LR
+    subgraph L1["Laptop"]
+        A["A. pack.py<br/>code.zip + data.zip"]
+    end
+    subgraph K["Kaggle"]
+        C["C. train_on_kaggle.ipynb<br/>copy → install → GPU check<br/>→ full_pipeline → run zip"]
+    end
+    subgraph L2["Laptop"]
+        D["D. unpack.py"] --> E["E. log_run_pipeline<br/>→ MLflow UI"]
+    end
+    A -- "B. Upload" --> C
+    C -- "Download" --> D
 ```
 
 | File | What it does |

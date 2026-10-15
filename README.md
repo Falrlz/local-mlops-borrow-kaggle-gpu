@@ -18,12 +18,19 @@ Free cloud GPUs exist, and Kaggle gives about 30 GPU hours per week on a GPU T4 
 
 This template keeps **one project and one command** for both places. The laptop stays the home base: the project is built, tested and tracked there with **uv** and **MLflow**. Only training moves to Kaggle, as two zips (code and data, uploaded separately), and the notebook runs exactly the command used on the laptop. Every run writes one self-contained **run folder**; that folder travels back home and is logged to the local MLflow by the same code that logs local runs. On a Kaggle GPU T4 x2, the full 20-epoch run of the example took **4.6 minutes** and reached **0.935 test macro F1**, and it sits in MLflow next to the laptop runs with its git commit, GPU and data fingerprint.
 
-```text
- LAPTOP (home base)          KAGGLE (borrowed GPU)           LAPTOP (home base)
- ──────────────────          ─────────────────────           ──────────────────
- A. Pack                     C. Run                          D. Unpack
-    code.zip + data.zip  ─B─►   install → train →        ─►  E. Log to MLflow
-                                evaluate → zip results          compare runs
+```mermaid
+flowchart LR
+    subgraph L1["Laptop (home base)"]
+        A["A. Pack<br/>code.zip + data.zip"]
+    end
+    subgraph K["Kaggle (borrowed GPU)"]
+        C["C. Run<br/>install → train → evaluate<br/>→ zip results"]
+    end
+    subgraph L2["Laptop (home base)"]
+        D["D. Unpack"] --> E["E. Log to MLflow<br/>compare runs"]
+    end
+    A -- "B. Upload" --> C
+    C -- "Download" --> D
 ```
 
 Key promises:

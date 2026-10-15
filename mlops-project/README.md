@@ -142,6 +142,43 @@ mlops-project/
 └── outputs/          # runs/, mlflow/, pretrained/ (not tracked by git)
 ```
 
+### Data folders
+
+Images are never tracked by git; only `data/raw/.gitkeep` is, to show where they go. After download and data prep, `data/` looks like this:
+
+```text
+data/
+├── raw/                          # input: one folder per class, any image names
+│   ├── daisy/
+│   │   ├── 100080576_f52e8ee070_n.jpg
+│   │   └── ...
+│   ├── dandelion/
+│   ├── roses/
+│   ├── sunflowers/
+│   └── tulips/
+└── splits/                       # output of data_prep_pipeline (what data.zip carries to Kaggle)
+    ├── train/                    # 70%, same class folders as raw/
+    │   ├── daisy/
+    │   ├── dandelion/
+    │   ├── roses/
+    │   ├── sunflowers/
+    │   └── tulips/
+    ├── val/                      # 15%
+    │   └── <class>/
+    ├── test/                     # 15%
+    │   └── <class>/
+    └── split_manifest.csv        # one row per image
+```
+
+`split_manifest.csv` records where every image went. Its hash is the data fingerprint saved in each run.
+
+```text
+split,class_name,file,source
+train,dandelion,train/dandelion/8842317179_d59cf218cb_n.jpg,dandelion/8842317179_d59cf218cb_n.jpg
+```
+
+With your own data, the class folders are simply your own folder names.
+
 Three rules keep it easy to change:
 
 1. **`src/` never reads YAML or decides the flow**; `pipelines/` never holds logic.
