@@ -10,6 +10,9 @@ from pathlib import Path
 # mlops-project/ folder (this file lives in mlops-project/src/core/)
 BASE_DIR = Path(__file__).resolve().parents[2]
 
+# Written into code.zip by kaggle-bridge/pack.py (git commit for Kaggle runs)
+GIT_INFO_PATH = BASE_DIR / "git_info.json"
+
 # Settings
 CONFIGS_DIR = BASE_DIR / "configs"
 

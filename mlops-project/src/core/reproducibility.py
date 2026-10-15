@@ -4,6 +4,7 @@ Seed, device and environment information.
 Used by the training and evaluation pipelines.
 """
 
+import json
 import os
 import platform
 import random
@@ -14,7 +15,7 @@ import numpy as np
 import torch
 import torchvision
 
-from src.core.paths import BASE_DIR
+from src.core.paths import BASE_DIR, GIT_INFO_PATH
 
 
 def set_seed(seed: int, deterministic: bool) -> None:
@@ -50,14 +51,14 @@ def is_kaggle() -> bool:
     return "KAGGLE_KERNEL_RUN_TYPE" in os.environ
 
 
-def get_git_commit() -> str | None:
-    """Return the current git commit, or None outside a git checkout (e.g. Kaggle)."""
+def run_git(args: list[str]) -> str | None:
+    """Run a read-only git command in BASE_DIR; None if git or the repo is missing."""
 
     if shutil.which("git") is None:
         return None
 
     result = subprocess.run(
-        ["git", "rev-parse", "HEAD"],
+        ["git", *args],
         cwd=BASE_DIR,
         capture_output=True,
         text=True,
@@ -66,6 +67,27 @@ def get_git_commit() -> str | None:
     if result.returncode != 0:
         return None
     return result.stdout.strip()
+
+
+def git_info() -> dict:
+    """
+    Return the git commit and whether the project has uncommitted changes.
+
+    In a git checkout git is asked directly. On Kaggle there is no .git folder,
+    so the values come from git_info.json, written into code.zip by
+    kaggle-bridge/pack.py. Unknown values are None.
+    """
+
+    commit = run_git(["rev-parse", "HEAD"])
+    if commit is not None:
+        changes = run_git(["status", "--porcelain", "--", "."])
+        return {"commit": commit, "dirty": changes != ""}
+
+    if GIT_INFO_PATH.exists():
+        with GIT_INFO_PATH.open(encoding="utf-8") as file:
+            return json.load(file)
+
+    return {"commit": None, "dirty": None}
 
 
 def environment_info() -> dict:
@@ -77,6 +99,7 @@ def environment_info() -> dict:
     if torch.cuda.is_available():
         gpu_name = torch.cuda.get_device_name(0)
 
+    git = git_info()
     return {
         "platform": run_platform,
         "python": platform.python_version(),
@@ -84,5 +107,6 @@ def environment_info() -> dict:
         "torchvision": torchvision.__version__,
         "cuda_available": torch.cuda.is_available(),
         "gpu": gpu_name,
-        "git_commit": get_git_commit(),
+        "git_commit": git["commit"],
+        "git_dirty": git["dirty"],
     }
