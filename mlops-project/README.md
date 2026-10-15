@@ -28,7 +28,7 @@ uv run mlflow ui --backend-store-uri sqlite:///outputs/mlflow/mlflow.db
 
 Open http://127.0.0.1:5000 to see the run.
 
-> **First time?** Set `epochs: 1` in `configs/train.yaml` for a quick check. One epoch takes about 8 minutes on a laptop CPU (intel i5-8265U).
+> **First time?** Set `epochs: 1` in `configs/train.yaml` for a quick check. One epoch takes about 8 minutes on a laptop CPU (Intel i5-8265U). For the full 20 epochs, borrow a Kaggle GPU with [`../kaggle-bridge/`](../kaggle-bridge/) (about 5 minutes on a GPU T4 x2).
 
 ---
 
@@ -142,6 +142,43 @@ mlops-project/
 └── outputs/          # runs/, mlflow/, pretrained/ (not tracked by git)
 ```
 
+### Data folders
+
+Images are never tracked by git; only `data/raw/.gitkeep` is, to show where they go. After download and data prep, `data/` looks like this:
+
+```text
+data/
+├── raw/                          # input: one folder per class, any image names
+│   ├── daisy/
+│   │   ├── 100080576_f52e8ee070_n.jpg
+│   │   └── ...
+│   ├── dandelion/
+│   ├── roses/
+│   ├── sunflowers/
+│   └── tulips/
+└── splits/                       # output of data_prep_pipeline (what data.zip carries to Kaggle)
+    ├── train/                    # 70%, same class folders as raw/
+    │   ├── daisy/
+    │   ├── dandelion/
+    │   ├── roses/
+    │   ├── sunflowers/
+    │   └── tulips/
+    ├── val/                      # 15%
+    │   └── <class>/
+    ├── test/                     # 15%
+    │   └── <class>/
+    └── split_manifest.csv        # one row per image
+```
+
+`split_manifest.csv` records where every image went. Its hash is the data fingerprint saved in each run.
+
+```text
+split,class_name,file,source
+train,dandelion,train/dandelion/8842317179_d59cf218cb_n.jpg,dandelion/8842317179_d59cf218cb_n.jpg
+```
+
+With your own data, the class folders are simply your own folder names.
+
 Three rules keep it easy to change:
 
 1. **`src/` never reads YAML or decides the flow**; `pipelines/` never holds logic.
@@ -172,14 +209,14 @@ Findings from the EDA notebook ([`notebooks/01_exploratory_data_analysis.ipynb`]
 
 **Model:** `efficientnet_b0` pretrained on ImageNet (5.3 M parameters, 0.39 GFLOPs), last layer resized to the number of classes. Adam, cross-entropy, augmentation `RandomResizedCrop` + horizontal flip.
 
-### Sanity run (1 epoch, laptop CPU, 8 minutes)
+### Results
 
-| Split | Accuracy | Macro F1 |
-| :--- | ---: | ---: |
-| Val | 0.887 | 0.884 |
-| Test | 0.893 | 0.892 |
+| Run | Where | Epochs | Time | Val acc | Val macro F1 | Test acc | Test macro F1 |
+| :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `efficientnet_b0_1_epoch` | Laptop CPU (i5-8265U) | 1 | 8 min | 0.887 | 0.884 | 0.893 | 0.892 |
+| `efficientnet_b0_train_kaggle` | Kaggle GPU T4 x2 | 20 (best: 15) | 4.6 min | **0.938** | **0.937** | **0.935** | **0.935** |
 
-One epoch already reaches 0.88 macro F1 thanks to the pretrained weights. A full run (`epochs: 20` with early stopping) belongs on a GPU.
+One epoch already reaches 0.88 macro F1 thanks to the pretrained weights. The full run took about 14 seconds per epoch on the Kaggle GPU T4 x2, against 8 minutes per epoch on the laptop CPU. The weights of epoch 15 (best val macro F1) are used for evaluation; test was scored once, after the choice.
 
 ---
 

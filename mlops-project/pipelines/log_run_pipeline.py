@@ -73,6 +73,7 @@ def run_log_run(train_config_path: Path = CONFIGS_DIR / "train.yaml") -> str:
         "platform": environment["platform"],
         "gpu": str(environment["gpu"]),
         "git_commit": str(environment["git_commit"]),
+        "git_dirty": str(environment["git_dirty"]),
         "data_fingerprint": run_info["data_fingerprint"],
         "eval_weights": eval_results["weights"],
         "started_at": run_info["started_at"],
